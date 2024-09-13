@@ -1,6 +1,5 @@
 from playwright.sync_api import Page, Locator
-from allure import step
-
+from src.framework.step_with_logging import step_with_logging
 from src.config import url
 from src.pages.abstract_page import AbstractPage
 
@@ -14,14 +13,12 @@ class MainPage(AbstractPage):
     def __init__(self, page: Page):
         super().__init__(page)
 
-    @step("Click on 'Signup' button")
+    @step_with_logging("Click on 'Signup' button")
     def click_on_sign_up_button(self) -> None:
-        self.logger.info("click on 'Signup' button")
         self.get_element_by_text(self._SIGNUP_LOGIN_TEXT).click()
 
-    @step("Click on 'Signup' button")
-    def delete_account(self):
-        self.logger.info("click on 'Delete Account' button")
+    @step_with_logging("Click on 'Delete Account' button")
+    def delete_account(self) -> None:
         self.get_element_by_text(self._DELETE_ACCOUNT).click()
 
     def login_label(self, username: str) -> "Locator":

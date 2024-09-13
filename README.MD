@@ -19,7 +19,8 @@ Execute for build allure report
 allure serve allure-results
 ```
 
-### Additional
-Test running via chromium by default.
-Set environment variable BROWSER = 'firefox' to run tests via firefox.
-Set environment variable HEADLESS = True to run test in headless mode.
+### Additional details
+* Test running via chromium by default.
+* Set environment variable BROWSER = 'firefox' to run tests via firefox
+* Set environment variable HEADLESS = True to run test in headless mode
+* Default actions timeout = 10 sec
