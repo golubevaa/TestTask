@@ -1,17 +1,13 @@
+from faker.proxy import Faker
 from src.config import url
 from src.pages.abstract_page import AbstractPage
-from random import choice
-from playwright.sync_api import Page
-
-GENDER_VALUES = ("Mr", "Mrs")
-MONTHS = ("January", "February", "March", "April", "May", "June",
-          "July", "September", "October", "November", "December")
-DAYS = [str(i) for i in range(1, 32)]
-YEARS = [str(i) for i in range(1900, 2021)]
-COUNTRY = ("India","United States", "Canada", "Australia", "Israel", "New Zealand", "Singapore")
+from playwright.sync_api import Page, Locator
+from src.framework.step_with_logging import step_with_logging
+from allure import step
 
 class AccountInformationPage(AbstractPage):
     _URL = "{}/signup".format(url.MAIN_PAGE)
+    _CLASS_TITLE = "login-form"
     _DATA_QA_INPUT_PASSWORD = "password"
     _DATA_QA_RADIO_TITLE = "title"
     _DATA_QA_DROPBOX_DAY = "days"
@@ -35,57 +31,94 @@ class AccountInformationPage(AbstractPage):
     def __init__(self, page: Page):
         super().__init__(page)
 
+    @property
+    def enter_account_info_title(self) -> "Locator":
+        return self.find_by_class(self._CLASS_TITLE)
+
+    @step("Filling profile with personal data")
+    def enter_account_information(self, gender: str, person: Faker, day: str, month: str, year: str) -> None:
+        self.select_gender(gender)
+        self.fill_password(person.password())
+        self.select_date_of_birth(day, month, year)
+        self.select_offers_checkbox()
+        self.select_newsletter_checkbox()
+
+    @step("Filling profile with address info")
+    def enter_address_information(self, name: str, person: Faker, country: str) -> None:
+        self.fill_first_name(name)
+        self.fill_last_name(person.last_name())
+        self.fill_company(person.company())
+        self.fill_address(person.address())
+        self.fill_sec_address(person.secondary_address())
+        self.select_country(country)
+        self.fill_state(person.state())
+        self.fill_city(person.city())
+        self.fill_zipcode(person.zipcode())
+        self.fill_phone(person.phone_number())
+
+
+    @step_with_logging("Filling password with value {}")
     def fill_password(self, password: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_PASSWORD).fill(password)
 
-    def select_gender(self):
-        current_gender = choice(GENDER_VALUES)
-        self.find_by_value(current_gender).click()
+    @step_with_logging("Check gender by value: '{}'")
+    def select_gender(self, gender: str) -> None:
+        self.find_by_value(gender).click()
 
-    def select_date_of_birth(self):
-        day = choice(DAYS)
-        month = choice(MONTHS)
-        year = str(choice(YEARS))
+    @step_with_logging("Select day of birth with day = '{}', month = '{}', year = '{}'")
+    def select_date_of_birth(self, day: str, month: str, year: str):
         self.find_by_data_qa(self._DATA_QA_DROPBOX_DAY).select_option(day)
         self.find_by_data_qa(self._DATA_QA_DROPBOX_MONTH).select_option(month)
         self.find_by_data_qa(self._DATA_QA_DROPBOX_YEAR).select_option(year)
 
+    @step_with_logging("Checking newsletter checkbox")
     def select_newsletter_checkbox(self) -> None:
         self.find_by_name(self._NAME_CHECKBOX_NEWS).click()
 
+    @step_with_logging("Checking offers checkbox")
     def select_offers_checkbox(self) -> None:
         self.find_by_name(self._NAME_CHECKBOX_OFFERS).click()
 
-    def fill_first_name(self, first_name: str):
+    @step_with_logging("Fill first name input with value '{}'")
+    def fill_first_name(self, first_name: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_FIRST_NAME).fill(first_name)
 
-    def fill_last_name(self, last_name: str):
+    @step_with_logging("Fill last name input with value '{}'")
+    def fill_last_name(self, last_name: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_LAST_NAME).fill(last_name)
 
-    def fill_company(self, company: str):
+    @step_with_logging("Fill company input with value '{}'")
+    def fill_company(self, company: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_COMPANY).fill(company)
 
+    @step_with_logging("Fill address input with value '{}'")
     def fill_address(self, address: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_ADDRESS).fill(address)
 
+    @step_with_logging("Fill secondary address input with value '{}'")
     def fill_sec_address(self, sec_address: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_SEC_ADDRESS).fill(sec_address)
 
+    @step_with_logging("fill state input with value '{}'")
     def fill_state(self, state: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_STATE).fill(state)
 
+    @step_with_logging("fill city input with value '{}'")
     def fill_city(self, city: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_CITY).fill(city)
 
+    @step_with_logging("Fill zipcode input with value '{}'")
     def fill_zipcode(self, zipcode: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_ZIPCODE).fill(zipcode)
 
+    @step_with_logging("Fill phone input with value '{}'")
     def fill_phone(self, phone: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_PHONE).fill(phone)
 
-    def select_country(self):
-        country = choice(COUNTRY)
+    @step_with_logging("select country with option '{}'")
+    def select_country(self, country: str) -> None:
         self.find_by_data_qa(self._DATA_QA_INPUT_COUNTRY).select_option(country)
 
-    def create_account(self):
+    @step_with_logging("click to button 'Create Account'")
+    def create_account(self) -> None:
         self.find_by_data_qa(self._DATA_QA_BUTTON_CREATE_ACCOUNT).click()

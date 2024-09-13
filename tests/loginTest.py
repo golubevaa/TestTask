@@ -1,71 +1,65 @@
 from faker import Faker
-
 from src.pages.main_page import MainPage
 from src.pages.login_page import LoginPage
 from src.pages.account_information_page import AccountInformationPage
 from src.pages.account_created_page import AccountCreatedPage
+from src.pages.delete_account_page import DeleteAccountPage
+from src.entities.signup_data import GENDER_VALUES, DAYS, MONTHS, YEARS, COUNTRY
+from random import choice
+from allure import step, title, description
 
-
+@description("Users Operations")
 class TestLogin:
 
+    @title("Register User E2E Test")
     def test_full_login_process(self, page):
 
         expected_sign_up_text = "New User Signup!"
-        expected_account_info_text = "Enter Account Information"
+        expected_account_info_text = "ENTER ACCOUNT INFORMATION"
         expected_created_account_text = "ACCOUNT CREATED!"
-        faker = Faker()
-        first_name = faker.first_name()
-        last_name = faker.last_name()
-        email = faker.email()
-        password = faker.password()
-        company = faker.company()
-        address = faker.address()
-        city = faker.city()
-        sec_address = faker.secondary_address()
-        state = faker.state()
-        zipcode = faker.zipcode()
-        phone = faker.phone_number()
+        expected_account_deleted_text = "ACCOUNT DELETED!"
+        person = Faker()
+        first_name = person.first_name()
+        gender = choice(GENDER_VALUES)
+        day = choice(DAYS)
+        month = choice(MONTHS)
+        year = choice(YEARS)
+        country = choice(COUNTRY)
 
         main_page = MainPage(page)
         main_page.open_page()
         main_page.click_on_sign_up_button()
-        assert page.get_by_text(expected_sign_up_text).is_visible()
 
         login_page = LoginPage(page)
-        login_page.fill_input_name(first_name)
-        login_page.fill_input_email(email)
-        login_page.signup()
-        assert page.get_by_text(expected_account_info_text).is_visible()
+        with step("Check {} is displayed".format(expected_sign_up_text)):
+            assert expected_sign_up_text in login_page.signup_title.inner_text()
+            assert login_page.signup_title.is_visible()
+
+        login_page.perform_sign_up_preparations(name=first_name, email=person.email())
 
         account_info_page = AccountInformationPage(page)
-        account_info_page.select_gender()
-        account_info_page.fill_password(password)
-        account_info_page.select_date_of_birth()
-        account_info_page.select_newsletter_checkbox()
-        account_info_page.select_offers_checkbox()
-        account_info_page.fill_first_name(first_name)
-        account_info_page.fill_last_name(last_name)
-        account_info_page.fill_company(company)
-        account_info_page.fill_address(address)
-        account_info_page.fill_sec_address(sec_address)
-        account_info_page.select_country()
-        account_info_page.fill_state(state)
-        account_info_page.fill_city(city)
-        account_info_page.fill_zipcode(zipcode)
-        account_info_page.fill_phone(phone)
+        with step("Check {} is displayed".format(expected_account_info_text)):
+            assert expected_account_info_text in account_info_page.enter_account_info_title.inner_text()
+            assert account_info_page.enter_account_info_title.is_visible()
+
+        account_info_page.enter_account_information(gender=gender, person=person,
+                                                    day=day, month=month, year=year)
+        account_info_page.enter_address_information(name=first_name, person=person, country=country)
         account_info_page.create_account()
 
-        assert page.get_by_text(expected_created_account_text).is_visible()
+        account_created_page = AccountCreatedPage(page)
+        with step("Check {} is displayed".format(expected_created_account_text)):
+            assert expected_created_account_text in account_created_page.account_created_title.inner_text()
+            assert account_created_page.account_created_title.is_visible()
 
-        AccountCreatedPage(page).continue_usage()
-        pass
+        account_created_page.continue_usage()
 
+        with step("Check 'Logged in as {}' is displayed".format(first_name)):
+            assert main_page.login_label(first_name).is_visible()
 
+        main_page.delete_account()
 
-
-
-
-
-
-
-
+        delete_account_page = DeleteAccountPage(page)
+        with step("Check {} is displayed".format(expected_account_deleted_text)):
+            assert expected_account_deleted_text in delete_account_page.account_deleted_label.inner_text()
+            assert  delete_account_page.account_deleted_label.is_visible()
