@@ -15,7 +15,7 @@ class AbstractPage(ABC):
         self.logger = logging.getLogger(__name__)
 
     def open_page(self) -> None:
-        step_description = "open {}".format(self._URL)
+        step_description = "Open {}".format(self._URL)
         with step(step_description):
             self._page.goto(self._URL)
             self.logger.info(step_description)

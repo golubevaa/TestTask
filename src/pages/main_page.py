@@ -24,7 +24,5 @@ class MainPage(AbstractPage):
         self.logger.info("click on 'Delete Account' button")
         self.get_element_by_text(self._DELETE_ACCOUNT).click()
 
-
     def login_label(self, username: str) -> "Locator":
         return self.get_element_by_text(self._LOGIN_LABEL.format(username))
-

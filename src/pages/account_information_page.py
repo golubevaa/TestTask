@@ -5,6 +5,7 @@ from playwright.sync_api import Page, Locator
 from src.framework.step_with_logging import step_with_logging
 from allure import step
 
+
 class AccountInformationPage(AbstractPage):
     _URL = "{}/signup".format(url.MAIN_PAGE)
     _CLASS_TITLE = "login-form"
@@ -55,7 +56,6 @@ class AccountInformationPage(AbstractPage):
         self.fill_city(person.city())
         self.fill_zipcode(person.zipcode())
         self.fill_phone(person.phone_number())
-
 
     @step_with_logging("Filling password with value {}")
     def fill_password(self, password: str) -> None:

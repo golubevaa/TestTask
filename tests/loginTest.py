@@ -6,9 +6,10 @@ from src.pages.account_created_page import AccountCreatedPage
 from src.pages.delete_account_page import DeleteAccountPage
 from src.entities.signup_data import GENDER_VALUES, DAYS, MONTHS, YEARS, COUNTRY
 from random import choice
-from allure import step, title, description
+from allure import step, title, suite
 
-@description("Users Operations")
+
+@suite("Users Operations")
 class TestLogin:
 
     @title("Register User E2E Test")
@@ -31,16 +32,20 @@ class TestLogin:
         main_page.click_on_sign_up_button()
 
         login_page = LoginPage(page)
-        with step("Check {} is displayed".format(expected_sign_up_text)):
-            assert expected_sign_up_text in login_page.signup_title.inner_text()
-            assert login_page.signup_title.is_visible()
+        with step("Check '{}' is displayed".format(expected_sign_up_text)):
+            assert expected_sign_up_text in login_page.signup_title.inner_text(), \
+                "Title contain text about beginning of sing up"
+            assert login_page.signup_title.is_visible(), \
+                "Title is displayed"
 
         login_page.perform_sign_up_preparations(name=first_name, email=person.email())
 
         account_info_page = AccountInformationPage(page)
-        with step("Check {} is displayed".format(expected_account_info_text)):
-            assert expected_account_info_text in account_info_page.enter_account_info_title.inner_text()
-            assert account_info_page.enter_account_info_title.is_visible()
+        with step("Check '{}' is displayed".format(expected_account_info_text)):
+            assert expected_account_info_text in account_info_page.enter_account_info_title.inner_text(), \
+                "Title contains text about filling profile"
+            assert account_info_page.enter_account_info_title.is_visible(), \
+                "Title is displayed"
 
         account_info_page.enter_account_information(gender=gender, person=person,
                                                     day=day, month=month, year=year)
@@ -48,9 +53,11 @@ class TestLogin:
         account_info_page.create_account()
 
         account_created_page = AccountCreatedPage(page)
-        with step("Check {} is displayed".format(expected_created_account_text)):
-            assert expected_created_account_text in account_created_page.account_created_title.inner_text()
-            assert account_created_page.account_created_title.is_visible()
+        with step("Check '{}' is displayed".format(expected_created_account_text)):
+            assert expected_created_account_text in account_created_page.account_created_title.inner_text(), \
+                "Title contains text about account creation"
+            assert account_created_page.account_created_title.is_visible(), \
+                "Title is displayed"
 
         account_created_page.continue_usage()
 
@@ -60,6 +67,8 @@ class TestLogin:
         main_page.delete_account()
 
         delete_account_page = DeleteAccountPage(page)
-        with step("Check {} is displayed".format(expected_account_deleted_text)):
-            assert expected_account_deleted_text in delete_account_page.account_deleted_label.inner_text()
-            assert  delete_account_page.account_deleted_label.is_visible()
+        with step("Check '{}' is displayed".format(expected_account_deleted_text)):
+            assert expected_account_deleted_text in delete_account_page.account_deleted_label.inner_text(), \
+                "Title contains text about user's delete"
+            assert delete_account_page.account_deleted_label.is_visible(), \
+                "Title is displayed"

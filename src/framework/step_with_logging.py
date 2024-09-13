@@ -1,7 +1,10 @@
+import logging
 from typing import Callable
-from venv import logger
-
 from allure import step as allure_step
+
+
+logger = logging.getLogger(__name__)
+
 
 def step_with_logging(description: str) -> Callable:
     def decorated_step(func: Callable) -> Callable:
@@ -16,4 +19,3 @@ def step_with_logging(description: str) -> Callable:
 
         return wrap
     return decorated_step
-
