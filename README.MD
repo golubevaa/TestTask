@@ -9,7 +9,7 @@ Installed python3 is required (I used 3.11.2)
 ```commandline
 pip install -r requirements.txt
 playwright install
-pytest tests/logingTest.py
+pytest tests/loginTest.py
 ```
 
 ### Allure results
